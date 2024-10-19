@@ -80,7 +80,7 @@ void APaperCharacterBase::SwitchAnimation(const FVector2d& value)
 	{
 		GetSprite()->SetFlipbook(Animations["RIGHT"]);
 	}
-	if(value.Y > 0)
+	else if(value.Y > 0)
 	{
 		GetSprite()->SetFlipbook(Animations["UP"]);
 	}
