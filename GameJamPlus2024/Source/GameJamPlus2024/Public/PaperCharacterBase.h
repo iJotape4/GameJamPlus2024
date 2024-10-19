@@ -9,9 +9,12 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 {
 	GENERATED_BODY()
+
+public:
+	APaperCharacterBase();
 	
 };
