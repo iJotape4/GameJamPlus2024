@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleJumpComponent.h"
 #include "InputActionValue.h"
 #include "PaperCharacter.h"
 #include "PaperFlipbook.h"
@@ -37,6 +38,9 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 
 public:
 	APaperCharacterBase();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
+	UDoubleJumpComponent* DoubleJumpComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))

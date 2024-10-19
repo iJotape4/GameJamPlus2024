@@ -12,7 +12,7 @@ class GAMEJAMPLUS2024_API UCharacterUpgrade : public UActorComponent
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Upgrades", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bEnabled = false;
 	
 public:	

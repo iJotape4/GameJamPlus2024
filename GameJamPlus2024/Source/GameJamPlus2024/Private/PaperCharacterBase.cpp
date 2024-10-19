@@ -10,6 +10,7 @@
 
 APaperCharacterBase::APaperCharacterBase()
 {
+	DoubleJumpComponent = CreateDefaultSubobject<UDoubleJumpComponent>(TEXT("DoubleJumpComponent"));
 }
 
 
