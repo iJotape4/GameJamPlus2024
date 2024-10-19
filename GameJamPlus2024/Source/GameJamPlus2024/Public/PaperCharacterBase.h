@@ -24,6 +24,11 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	//** Rotate Camera Input ACtion */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* RotateCameraAction;
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TMap<FString, UPaperFlipbook*> Animations;
@@ -33,10 +38,13 @@ public:
 	APaperCharacterBase();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))
+	float CameraRotationAngle = 0.5f;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 	void SwitchAnimation(const FVector2d& Value);
+	void RotateCamera(const FInputActionValue& Value);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
