@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
+#include "PaperFlipbook.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
 #include "PaperCharacterBase.generated.h"
 
@@ -22,6 +23,10 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	TMap<FString, UPaperFlipbook*> Animations;
 	
 public:
 	APaperCharacterBase();
