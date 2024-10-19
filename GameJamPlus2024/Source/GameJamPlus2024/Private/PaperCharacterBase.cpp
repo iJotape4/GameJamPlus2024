@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "PaperFlipbookComponent.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
 
 APaperCharacterBase::APaperCharacterBase()
@@ -55,6 +56,34 @@ void APaperCharacterBase::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+
+		SwitchAnimation(MovementVector);
+	}
+}
+
+void APaperCharacterBase::SwitchAnimation(const FVector2d& value)
+{
+	if(GetSprite() == nullptr)
+	{
+		UE_LOG(LogAnimation, Error, TEXT("SpriteComponent is null"));
+		return;
+	}
+	
+	if(value.X > 0)
+	{
+		GetSprite()->SetFlipbook(Animations["LEFT"]);
+	}
+	else if(value.X < 0)
+	{
+		GetSprite()->SetFlipbook(Animations["RIGHT"]);
+	}
+	if(value.Y > 0)
+	{
+		GetSprite()->SetFlipbook(Animations["UP"]);
+	}
+	else if(value.Y < 0)
+	{
+		GetSprite()->SetFlipbook(Animations["DOWN"]);
 	}
 }
 
