@@ -40,7 +40,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))
-	float CameraRotationAngle = 0.5f;
+	float CameraRotationAngle = 90.0f;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
