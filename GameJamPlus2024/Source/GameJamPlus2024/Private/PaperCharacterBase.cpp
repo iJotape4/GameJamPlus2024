@@ -32,6 +32,10 @@ void APaperCharacterBase::SetupPlayerInputComponent(class UInputComponent* Playe
 
 		//Camera Rotation
 		EnhancedInputComponent->BindAction(RotateCameraAction, ETriggerEvent::Triggered, this, &APaperCharacterBase::RotateCamera);
+
+		//Jump
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	}
 	else
 	{

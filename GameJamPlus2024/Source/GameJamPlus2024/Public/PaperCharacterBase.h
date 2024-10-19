@@ -29,11 +29,12 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RotateCameraAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TMap<FString, UPaperFlipbook*> Animations;
 
-	
 public:
 	APaperCharacterBase();
 
