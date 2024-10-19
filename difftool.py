@@ -134,7 +134,7 @@ else:
 	# Execute the ureal difftool!
 	print("~ Execute UE difftool ~")
 
-	proc = subprocess.Popen([ue_editor_path, uproject_file_path, "-diff"] + args)
+	proc = subprocess.Popen([ue_editor_path, uproject_file_path, "-diff"] + list(reversed(args)))
 	proc.wait()
 
 print("Difftool executed.")
