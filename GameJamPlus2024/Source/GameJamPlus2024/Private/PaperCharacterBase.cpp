@@ -8,6 +8,7 @@
 #include "EventsManager.h"
 #include "PaperFlipbookComponent.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
+#include "Hazards/HazardBase.h"
 
 APaperCharacterBase::APaperCharacterBase()
 {
@@ -125,4 +126,17 @@ void APaperCharacterBase::TakeDamage(int Damage)
 void APaperCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	OnActorBeginOverlap.AddDynamic(this, &APaperCharacterBase::OnBeginOverlap);
+}
+
+void APaperCharacterBase::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor && OtherActor != this) // Ensure it's a valid actor and not self
+	{
+		AHazardBase* Hazard = Cast<AHazardBase>(OtherActor);
+		if(Hazard != nullptr)
+		{
+			TakeDamage(Hazard->Damage);
+		}
+	}
 }

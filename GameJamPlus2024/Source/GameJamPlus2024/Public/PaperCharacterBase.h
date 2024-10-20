@@ -57,4 +57,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay() override;
+private:
+	
+	UFUNCTION()
+	void OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor);
 };

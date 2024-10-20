@@ -20,7 +20,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrades", meta = (AllowPrivate))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivate))
 	UBoxComponent* CollisionBox;
 
 
@@ -28,4 +28,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HazardValues", meta = (AllowPrivate))
+	int Damage = 10;
 };
