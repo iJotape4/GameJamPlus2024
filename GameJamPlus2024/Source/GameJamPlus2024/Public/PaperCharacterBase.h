@@ -37,6 +37,9 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TMap<FString, UPaperFlipbook*> Animations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* GrapplingHookAction;
+
 public:
 	APaperCharacterBase();
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterUpgrade.h"
+#include "InputAction.h"
 #include "GrapplingHookComponent.generated.h"
 
 /**
@@ -13,5 +14,8 @@ UCLASS()
 class GAMEJAMPLUS2024_API UGrapplingHookComponent : public UCharacterUpgrade
 {
 	GENERATED_BODY()
+
+public:
+	void LaunchHook();
 	
 };

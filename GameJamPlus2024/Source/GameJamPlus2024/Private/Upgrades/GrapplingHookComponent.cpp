@@ -3,3 +3,7 @@
 
 #include "Upgrades/GrapplingHookComponent.h"
 
+void UGrapplingHookComponent::LaunchHook()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hook Launched!"));
+}
