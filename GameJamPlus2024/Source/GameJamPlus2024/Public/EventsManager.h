@@ -7,7 +7,9 @@
 UENUM(BlueprintType)
 enum class E_EventType : uint8
 {
+	DamageTaken,
 	EnemyDeath,
+	MaxHealthUpgrade,
 };
 
 DECLARE_DELEGATE_TwoParams(FOnCallback, E_EventType, const int32);

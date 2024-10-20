@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "EventsManager.h"
 #include "PaperFlipbookComponent.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
 
@@ -111,8 +112,13 @@ void APaperCharacterBase::RotateCamera(const FInputActionValue& Value)
 	{
 		TargetRotation.Yaw += CameraRotationAngle;  // Rotate right
 	}
-
+	/// DEBUG ONLY: TakeDamage(10);
 	GetController()->SetControlRotation(TargetRotation);
+}
+
+void APaperCharacterBase::TakeDamage(UINT Damage)
+{
+	EventsManager::SendEvent(E_EventType::DamageTaken, Damage);
 }
 
 

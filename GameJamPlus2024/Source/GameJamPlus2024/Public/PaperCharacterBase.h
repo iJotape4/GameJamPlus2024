@@ -50,6 +50,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void SwitchAnimation(const FVector2d& Value);
 	void RotateCamera(const FInputActionValue& Value);
+	void TakeDamage(UINT Damage);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
