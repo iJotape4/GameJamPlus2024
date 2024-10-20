@@ -8,6 +8,7 @@
 #include "PaperCharacter.h"
 #include "PaperFlipbook.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
+#include "Upgrades/GrapplingHookComponent.h"
 #include "PaperCharacterBase.generated.h"
 
 /**
@@ -41,6 +42,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
 	UDoubleJumpComponent* DoubleJumpComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
+	UGrapplingHookComponent* GrapplingHookComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))

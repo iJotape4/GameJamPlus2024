@@ -13,6 +13,7 @@
 APaperCharacterBase::APaperCharacterBase()
 {
 	DoubleJumpComponent = CreateDefaultSubobject<UDoubleJumpComponent>(TEXT("DoubleJumpComponent"));
+	GrapplingHookComponent = CreateDefaultSubobject<UGrapplingHookComponent>(TEXT("GrapplingHookComponent"));
 }
 
 
