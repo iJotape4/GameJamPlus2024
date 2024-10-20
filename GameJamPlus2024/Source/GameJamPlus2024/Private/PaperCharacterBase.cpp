@@ -97,24 +97,24 @@ void APaperCharacterBase::SwitchAnimation(const FVector2d& value)
 	}
 }
 
+//ROTATECAMERA METHOD DEPRECATED TEMPORARILY
 void APaperCharacterBase::RotateCamera(const FInputActionValue& Value)
 {
-	FVector CameraRotation = Value.Get<FVector>();
-
-	//Method to rotate the camera smoothly by a certain angle when the input is triggered
-	FRotator CurrentRotation = Controller->GetControlRotation();
-	FRotator TargetRotation = CurrentRotation;
-
-	if (CameraRotation.X < 0)
-	{
-		TargetRotation.Yaw -= CameraRotationAngle;  // Rotate left
-	}
-	else if (CameraRotation.X > 0)
-	{
-		TargetRotation.Yaw += CameraRotationAngle;  // Rotate right
-	}
-	/// DEBUG ONLY: TakeDamage(10);
-	GetController()->SetControlRotation(TargetRotation);
+	// FVector CameraRotation = Value.Get<FVector>();
+	//
+	// //Method to rotate the camera smoothly by a certain angle when the input is triggered
+	// FRotator CurrentRotation = Controller->GetControlRotation();
+	// FRotator TargetRotation = CurrentRotation;
+	//
+	// if (CameraRotation.X < 0)
+	// {
+	// 	TargetRotation.Yaw -= CameraRotationAngle;  // Rotate left
+	// }
+	// else if (CameraRotation.X > 0)
+	// {
+	// 	TargetRotation.Yaw += CameraRotationAngle;  // Rotate right
+	// }
+	// GetController()->SetControlRotation(TargetRotation);
 }
 
 void APaperCharacterBase::TakeDamage(int Damage)
