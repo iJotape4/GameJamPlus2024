@@ -6,6 +6,7 @@ public class GameJamPlus2024 : ModuleRules
 {
 	public GameJamPlus2024(ReadOnlyTargetRules Target) : base(Target)
 	{
+		PrivateDependencyModuleNames.AddRange(new string[] { "AITestSuite", "AITestSuite", "AITestSuite" });
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Paper2D", "Paper2D", "UMGEditor", "UMGEditor" });

@@ -14,8 +14,10 @@ UCLASS()
 class GAMEJAMPLUS2024_API UGrapplingHookComponent : public UCharacterUpgrade
 {
 	GENERATED_BODY()
-
-public:
-	void LaunchHook();
 	
+protected:
+	void HookLineTrace(FHitResult& OutHit);
+public:
+	void LaunchHook(const FInputActionValue& Value);
+
 };

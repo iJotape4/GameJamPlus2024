@@ -42,12 +42,13 @@ class GAMEJAMPLUS2024_API APaperCharacterBase : public APaperCharacter
 
 public:
 	APaperCharacterBase();
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
 	UDoubleJumpComponent* DoubleJumpComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
 	UGrapplingHookComponent* GrapplingHookComponent;
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))
@@ -58,12 +59,18 @@ protected:
 	void SwitchAnimation(const FVector2d& Value);
 	void RotateCamera(const FInputActionValue& Value);
 	void TakeDamage(int Damage);
+	void EnableMouseEvents();
+
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
 	virtual void BeginPlay() override;
+public:	
+	FVector2D GetMousePosition();
+	FVector ConvertScreenToWorldPoint(const FVector2D& ScreenPosition);
+
 private:
 	
 	UFUNCTION()

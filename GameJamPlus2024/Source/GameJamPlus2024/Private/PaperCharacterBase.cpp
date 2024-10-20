@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EventsManager.h"
 #include "PaperFlipbookComponent.h"
+#include "Camera/CameraComponent.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
 #include "Hazards/HazardBase.h"
 
@@ -42,7 +43,11 @@ void APaperCharacterBase::SetupPlayerInputComponent(class UInputComponent* Playe
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Grappling Hook
-		EnhancedInputComponent->BindAction(GrapplingHookAction, ETriggerEvent::Triggered, GrapplingHookComponent, &UGrapplingHookComponent::LaunchHook);
+
+		//Bind Action, and call the hook launch method in the GrapplingHookComponent passing the mouse position
+		EnhancedInputComponent->BindAction(GrapplingHookAction, ETriggerEvent::Triggered, GrapplingHookComponent, &UGrapplingHookComponent::LaunchHook); 
+
+		//Cast<APlayerController>(GetController())->GetMousePosition(MousePosition.X, MousePosition.Y);
 	}
 	else
 	{
@@ -127,10 +132,44 @@ void APaperCharacterBase::TakeDamage(int Damage)
 }
 
 
+void APaperCharacterBase::EnableMouseEvents()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+
+	if (PC)
+	{
+		PC->bShowMouseCursor = true; 
+		PC->bEnableClickEvents = true; 
+		PC->bEnableMouseOverEvents = true;
+	}
+}
+
+FVector2D APaperCharacterBase::GetMousePosition()
+{
+	FVector2D MousePosition(0.0f, 0.0f);
+	Cast<APlayerController>(GetController())->GetMousePosition(MousePosition.X, MousePosition.Y);
+	return FVector2D(MousePosition);
+}
+
+FVector APaperCharacterBase::ConvertScreenToWorldPoint(const FVector2D& ScreenPosition)
+{
+	FVector WorldLocation;
+	FVector WorldDirection = GetActorRightVector();
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	FVector PlayerLocation = PlayerController->GetPawn()->GetActorLocation();
+	//UE_LOG(LogTemp, Log, TEXT("Player Location: X = %f, Y = %f, Z = %f"), PlayerLocation.X, PlayerLocation.Y, PlayerLocation.Z);
+	PlayerController->DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldLocation,WorldDirection);
+	
+	//return FVector(PlayerLocation.X, WorldLocation.X, WorldLocation.Y);
+	return WorldLocation;
+}
+
 void APaperCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	OnActorBeginOverlap.AddDynamic(this, &APaperCharacterBase::OnBeginOverlap);
+
+	EnableMouseEvents();
 }
 
 void APaperCharacterBase::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
