@@ -116,7 +116,7 @@ void APaperCharacterBase::RotateCamera(const FInputActionValue& Value)
 	GetController()->SetControlRotation(TargetRotation);
 }
 
-void APaperCharacterBase::TakeDamage(UINT Damage)
+void APaperCharacterBase::TakeDamage(int Damage)
 {
 	EventsManager::SendEvent(E_EventType::DamageTaken, Damage);
 }
