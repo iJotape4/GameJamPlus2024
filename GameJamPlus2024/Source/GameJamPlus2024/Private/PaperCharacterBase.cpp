@@ -35,6 +35,7 @@ void APaperCharacterBase::SetupPlayerInputComponent(class UInputComponent* Playe
 	{
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APaperCharacterBase::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APaperCharacterBase::Move);
 
 		//Camera Rotation
 		EnhancedInputComponent->BindAction(RotateCameraAction, ETriggerEvent::Triggered, this, &APaperCharacterBase::RotateCamera);
@@ -59,7 +60,7 @@ void APaperCharacterBase::SetupPlayerInputComponent(class UInputComponent* Playe
 void APaperCharacterBase::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector2D _movementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -74,10 +75,9 @@ void APaperCharacterBase::Move(const FInputActionValue& Value)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-
-		SwitchAnimation(MovementVector);
+		AddMovementInput(ForwardDirection, _movementVector.Y);
+		AddMovementInput(RightDirection, _movementVector.X);
+		MovementVector = _movementVector;
 	}
 }
 
@@ -88,8 +88,15 @@ void APaperCharacterBase::SwitchAnimation(const FVector2d& value)
 		UE_LOG(LogAnimation, Error, TEXT("SpriteComponent is null"));
 		return;
 	}
-	
-	if(value.X > 0)
+	if(JumpCurrentCount > 0)
+	{
+		GetSprite()->SetFlipbook(Animations["JUMP"]);
+	}
+	else if(value.X == 0 && value.Y == 0)
+	{
+		GetSprite()->SetFlipbook(Animations["IDLE"]);
+	}
+	 else if(value.X > 0)
 	{
 		GetSprite()->SetFlipbook(Animations["LEFT"]);
 	}
@@ -176,6 +183,12 @@ void APaperCharacterBase::BeginPlay()
 	OnActorBeginOverlap.AddDynamic(this, &APaperCharacterBase::OnBeginOverlap);
 
 	EnableMouseEvents();
+}
+
+void APaperCharacterBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	SwitchAnimation(MovementVector);
 }
 
 void APaperCharacterBase::OnBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)

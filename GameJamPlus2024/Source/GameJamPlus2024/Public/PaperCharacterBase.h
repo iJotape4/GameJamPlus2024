@@ -54,6 +54,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input", meta = (AllowPrivate = "true"))
 	float CameraRotationAngle = 90.0f;
 
+	FVector2d MovementVector = FVector2d::ZeroVector;
+	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 	void SwitchAnimation(const FVector2d& Value);
@@ -67,6 +69,7 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 public:	
 	FVector2D GetMousePosition();
 	FVector ConvertScreenToWorldPoint(const FVector2D& ScreenPosition);
