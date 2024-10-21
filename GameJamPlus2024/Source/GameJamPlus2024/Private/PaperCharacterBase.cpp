@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameJamPlus2024/GameJamPlus2024Character.h"
 #include "Hazards/HazardBase.h"
+#include "Kismet/GameplayStatics.h"
 
 APaperCharacterBase::APaperCharacterBase()
 {
@@ -109,6 +110,11 @@ void APaperCharacterBase::SwitchAnimation(const FVector2d& value)
 //ROTATECAMERA METHOD DEPRECATED TEMPORARILY
 void APaperCharacterBase::RotateCamera(const FInputActionValue& Value)
 {
+
+	// Obtiene el nombre del nivel actual
+	FName NombreNivelActual = *GetWorld()->GetMapName();
+	// Vuelve a cargar el nivel actual
+	UGameplayStatics::OpenLevel(this, NombreNivelActual);
 	// FVector CameraRotation = Value.Get<FVector>();
 	//
 	// //Method to rotate the camera smoothly by a certain angle when the input is triggered
