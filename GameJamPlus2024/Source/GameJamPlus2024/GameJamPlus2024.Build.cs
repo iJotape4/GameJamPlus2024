@@ -16,7 +16,8 @@ public class GameJamPlus2024 : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"Paper2D",
-			"UMG"  // Use UMG only, not UMGEditor
+			"UMG" ,
+			"CableComponent",
 		});
 
 		// Private dependencies for internal use

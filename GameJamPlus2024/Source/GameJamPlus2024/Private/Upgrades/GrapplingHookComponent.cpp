@@ -3,8 +3,6 @@
 
 #include "Upgrades/GrapplingHookComponent.h"
 
-#include <optional>
-
 #include "DrawDebugHelpers.h"  // For visualizing the trace in the editor (optional)
 #include "PaperCharacterBase.h"
 #include "Camera/CameraComponent.h"
@@ -12,6 +10,7 @@
 #include "GameFramework/Actor.h" // For working with actors
 #include "Kismet/KismetSystemLibrary.h"  // Optional for advanced tracing
 #include "Kismet/KismetMathLibrary.h"
+#include "CableComponent.h"
 
 
 void UGrapplingHookComponent::LaunchHook(const FInputActionValue& Value)
@@ -21,6 +20,28 @@ void UGrapplingHookComponent::LaunchHook(const FInputActionValue& Value)
 	FHitResult HitResult;  // The hit result of the line trace
 	HookLineTrace(HitResult);  // Perform the line trace
 }
+
+void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
+{
+	CableComponent->SetVisibility(bVisible);
+}
+
+void UGrapplingHookComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	CableComponent = GetOwner()->FindComponentByClass<UCableComponent>();
+}
+
+void UGrapplingHookComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(!isGrappling)
+		return;
+
+	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(GetOwner()->GetTransform(), Grabpoint);;
+}
+
 
 void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
 {
@@ -56,12 +77,29 @@ void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
 		
 		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, PlaneOrigin, IntersectionPoint, ECC_Visibility, CollisionParams);
         
+		SetCableComponentVisibility(true);
+		
 		if (bHit)
 		{
-			// Handle hit (e.g., log hit actor's name)
+			// Handle hit
 			UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *HitResult.GetActor()->GetName());
+
+			//CableComponent->EndLocation = HitResult.ImpactPoint;
+			Grabpoint = HitResult.ImpactPoint;
+			isGrappling = true;
+
+			//Cast<UCharacterMovementComponent>(Character)->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
-	
+		else
+		{
+			// Handle no hit 
+			UE_LOG(LogTemp, Warning, TEXT("No Hit"));
+			CableComponent->EndLocation =  (HitResult.TraceEnd - GetOwner()->GetActorLocation());
+			isGrappling = false;
+			UKismetSystemLibrary::Delay(GetWorld(), 0.2f, FLatentActionInfo());
+			//SetCableComponentVisibility(false);
+		}
+
 		//Draw debug line for visualization
 		DrawDebugLine(GetWorld(), PlaneOrigin, IntersectionPoint, FColor::Red, false, 4.0f, 0, 1.0f);
 	}
