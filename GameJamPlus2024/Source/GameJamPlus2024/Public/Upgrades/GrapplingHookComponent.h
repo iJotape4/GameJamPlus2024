@@ -29,6 +29,9 @@ public:
 	void LaunchHook(const FInputActionValue& Value);
 
 	UFUNCTION()
+	void RetractHook(const FInputActionValue& Value);
+
+	UFUNCTION()
 	void SetCableComponentVisibility(bool bVisible);
 
 public:

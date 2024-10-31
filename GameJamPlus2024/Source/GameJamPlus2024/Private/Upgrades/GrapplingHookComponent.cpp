@@ -21,6 +21,13 @@ void UGrapplingHookComponent::LaunchHook(const FInputActionValue& Value)
 	HookLineTrace(HitResult);  // Perform the line trace
 }
 
+void UGrapplingHookComponent::RetractHook(const FInputActionValue& Value)
+{
+	isGrappling = false;
+	SetCableComponentVisibility(false);
+	//Cast<UCharacterMovementComponent>(Character)->SetMovementMode(EMovementMode::MOVE_Falling);
+}
+
 void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 {
 	CableComponent->SetVisibility(bVisible);
