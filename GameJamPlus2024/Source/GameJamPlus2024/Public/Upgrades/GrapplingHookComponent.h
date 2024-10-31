@@ -4,6 +4,7 @@
 #include "CharacterUpgrade.h"
 #include "InputAction.h"
 #include "CableComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GrapplingHookComponent.generated.h"
 
 /**
@@ -20,6 +21,7 @@ protected:
 
 	bool isGrappling;
 	FVector Grabpoint;
+	UCharacterMovementComponent* CharacterMovement;
 
 	void HookLineTrace(FHitResult& OutHit);
 	virtual void BeginPlay() override;
@@ -32,8 +34,10 @@ public:
 	void RetractHook(const FInputActionValue& Value);
 
 	UFUNCTION()
+	void HookGrappling(const FInputActionValue& Value) ;
+	
+	UFUNCTION()
 	void SetCableComponentVisibility(bool bVisible);
 
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

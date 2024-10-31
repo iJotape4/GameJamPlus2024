@@ -11,11 +11,11 @@
 #include "Kismet/KismetSystemLibrary.h"  // Optional for advanced tracing
 #include "Kismet/KismetMathLibrary.h"
 #include "CableComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 void UGrapplingHookComponent::LaunchHook(const FInputActionValue& Value)
 {
-	APaperCharacterBase* Character = Cast<APaperCharacterBase>(GetOwner());
 
 	FHitResult HitResult;  // The hit result of the line trace
 	HookLineTrace(HitResult);  // Perform the line trace
@@ -28,6 +28,19 @@ void UGrapplingHookComponent::RetractHook(const FInputActionValue& Value)
 	//Cast<UCharacterMovementComponent>(Character)->SetMovementMode(EMovementMode::MOVE_Falling);
 }
 
+void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
+{
+	if(!isGrappling)
+		return;
+
+	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(GetOwner()->GetTransform(), Grabpoint);
+	FVector ForceToApply;
+	ForceToApply =  UKismetMathLibrary::GetDirectionUnitVector(GetOwner()->GetActorLocation(), Grabpoint) + GetOwner()->GetActorRightVector()*0.7f;
+	UKismetMathLibrary::Vector_Normalize ( ForceToApply, 1.0f);
+	ForceToApply *= 250000.0f;
+	CharacterMovement->AddForce(ForceToApply);
+}
+
 void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 {
 	CableComponent->SetVisibility(bVisible);
@@ -36,19 +49,9 @@ void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 void UGrapplingHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	CharacterMovement = Cast<APaperCharacterBase>(GetOwner())->FindComponentByClass<UCharacterMovementComponent>();
 	CableComponent = GetOwner()->FindComponentByClass<UCableComponent>();
 }
-
-void UGrapplingHookComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
-	FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if(!isGrappling)
-		return;
-
-	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(GetOwner()->GetTransform(), Grabpoint);;
-}
-
 
 void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
 {
