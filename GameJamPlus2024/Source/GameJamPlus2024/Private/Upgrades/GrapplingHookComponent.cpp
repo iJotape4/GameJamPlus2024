@@ -25,7 +25,7 @@ void UGrapplingHookComponent::RetractHook(const FInputActionValue& Value)
 {
 	isGrappling = false;
 	SetCableComponentVisibility(false);
-	//Cast<UCharacterMovementComponent>(Character)->SetMovementMode(EMovementMode::MOVE_Falling);
+	GetOwner()->FindComponentByClass<UCharacterMovementComponent>()->SetMovementMode(EMovementMode::MOVE_Falling);
 }
 
 void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
@@ -98,7 +98,7 @@ void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
 			Grabpoint = HitResult.ImpactPoint;
 			isGrappling = true;
 
-			//Cast<UCharacterMovementComponent>(Character)->SetMovementMode(EMovementMode::MOVE_Flying);
+			GetOwner()->FindComponentByClass<UCharacterMovementComponent>()->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 		else
 		{
