@@ -51,8 +51,6 @@ void APaperCharacterBase::SetupPlayerInputComponent(class UInputComponent* Playe
 		EnhancedInputComponent->BindAction(GrapplingHookAction, ETriggerEvent::Ongoing, GrapplingHookComponent, &UGrapplingHookComponent::HookGrappling);
 		EnhancedInputComponent->BindAction(GrapplingHookAction, ETriggerEvent::Completed, GrapplingHookComponent, &UGrapplingHookComponent::RetractHook);
 		EnhancedInputComponent->BindAction(GrapplingHookAction, ETriggerEvent::Canceled, GrapplingHookComponent, &UGrapplingHookComponent::RetractHook);
-
-		//Cast<APlayerController>(GetController())->GetMousePosition(MousePosition.X, MousePosition.Y);
 	}
 	else
 	{

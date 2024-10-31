@@ -38,7 +38,7 @@ void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
 	ForceToApply =  UKismetMathLibrary::GetDirectionUnitVector(GetOwner()->GetActorLocation(), Grabpoint) + GetOwner()->GetActorRightVector()*0.7f;
 	UKismetMathLibrary::Vector_Normalize ( ForceToApply, 1.0f);
 	ForceToApply *= 250000.0f;
-	CharacterMovement->AddForce(ForceToApply);
+	MovementComponent->AddForce(ForceToApply);
 }
 
 void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
@@ -49,68 +49,91 @@ void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 void UGrapplingHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	CharacterMovement = Cast<APaperCharacterBase>(GetOwner())->FindComponentByClass<UCharacterMovementComponent>();
+}
+
+bool UGrapplingHookComponent::InitializeComponents()
+{
+	Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
+	Character = Cast<APaperCharacterBase>(GetOwner());
+	PlayerController = Character ? Cast<APlayerController>(Character->GetController()) : nullptr;
+	MovementComponent = GetOwner()->FindComponentByClass<UCharacterMovementComponent>();
 	CableComponent = GetOwner()->FindComponentByClass<UCableComponent>();
+	
+	return Camera && Character && PlayerController && MovementComponent  &&  CableComponent;
 }
 
 void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
 {
-	UCameraComponent* Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
-	if (!Camera) return;
-	
-	APaperCharacterBase* Character = Cast<APaperCharacterBase>(GetOwner());
-	if (!Character) return;
-	
-	APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-	if (!PlayerController) return;
-	
-	FVector2D MousePosition(0.0f, 0.0f);
-	Cast<APlayerController>(PlayerController)->GetMousePosition(MousePosition.X, MousePosition.Y);
+	if (!InitializeComponents()) return;
 
-	// Deproject the mouse position to get the world direction
-	if (FVector WorldLocation, WorldDirection; PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
-	{
-		float Distance = 2000.0f;
-		///////// LINE PLANE INTERSECTION
-		FVector Start = Camera->GetComponentLocation(); // The character's location
-		FVector End = WorldLocation + (WorldDirection * Distance) ; // Adjust the distance as needed (10,000 units)
-		FVector PlaneOrigin = Character->GetActorLocation();  // A point on the plane (e.g., origin)
-		FVector PlaneNormal(1.0f, 0.0f, 0.0f);  // The plane's normal (e.g., x-axis)
-		FVector IntersectionPoint;
-		float T;
-		UKismetMathLibrary::LinePlaneIntersection_OriginNormal(Start, End, PlaneOrigin, PlaneNormal, T, IntersectionPoint);
-		
-		/////////// Perform the line trace
-		FHitResult HitResult;
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(GetOwner()); // Ignore the character itself
-		
-		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, PlaneOrigin, IntersectionPoint, ECC_Visibility, CollisionParams);
-        
-		SetCableComponentVisibility(true);
-		
-		if (bHit)
-		{
-			// Handle hit
-			UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *HitResult.GetActor()->GetName());
+	FVector2D MousePosition;
+	if (!GetMousePosition(MousePosition)) return;
 
-			//CableComponent->EndLocation = HitResult.ImpactPoint;
-			Grabpoint = HitResult.ImpactPoint;
-			isGrappling = true;
+	FVector WorldLocation, WorldDirection;
+	if (!DeprojectMousePosition(MousePosition, WorldLocation, WorldDirection)) return;
 
-			GetOwner()->FindComponentByClass<UCharacterMovementComponent>()->SetMovementMode(EMovementMode::MOVE_Flying);
-		}
-		else
-		{
-			// Handle no hit 
-			UE_LOG(LogTemp, Warning, TEXT("No Hit"));
-			CableComponent->EndLocation =  (HitResult.TraceEnd - GetOwner()->GetActorLocation());
-			isGrappling = false;
-			UKismetSystemLibrary::Delay(GetWorld(), 0.2f, FLatentActionInfo());
-			//SetCableComponentVisibility(false);
-		}
+	FVector IntersectionPoint;
+	if (!CalculateLinePlaneIntersection(WorldLocation, WorldDirection, IntersectionPoint)) return;
 
-		//Draw debug line for visualization
-		DrawDebugLine(GetWorld(), PlaneOrigin, IntersectionPoint, FColor::Red, false, 4.0f, 0, 1.0f);
-	}
+	PerformLineTrace(IntersectionPoint, OutHit);
 }
+
+
+bool UGrapplingHookComponent::GetMousePosition(FVector2D& MousePosition) const
+{
+	return PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
+}
+
+bool UGrapplingHookComponent::DeprojectMousePosition(const FVector2D& MousePosition, FVector& WorldLocation, FVector& WorldDirection) const
+{
+	return PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
+}
+
+bool UGrapplingHookComponent::CalculateLinePlaneIntersection(const FVector& WorldLocation, const FVector& WorldDirection, FVector& IntersectionPoint) const
+{
+	const float Distance = 2000.0f;
+	const FVector Start = Camera->GetComponentLocation();
+	const FVector End = WorldLocation + (WorldDirection * Distance);
+	const FVector PlaneOrigin = Character->GetActorLocation();
+	const FVector PlaneNormal(1.0f, 0.0f, 0.0f);
+	float T;
+
+	return UKismetMathLibrary::LinePlaneIntersection_OriginNormal(Start, End, PlaneOrigin, PlaneNormal, T, IntersectionPoint);
+}
+
+void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint, FHitResult& OutHit)
+{
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetOwner());
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Character->GetActorLocation(), IntersectionPoint, ECC_Visibility, CollisionParams);
+
+	SetCableComponentVisibility(true);
+	if (bHit)
+	{
+		HandleHit(OutHit);
+	}
+	else
+	{
+		HandleMiss(IntersectionPoint);
+	}
+	//Draw debug line for visualization
+	//DrawDebugLine(GetWorld(), Character->GetActorLocation(), IntersectionPoint, FColor::Red, false, 4.0f, 0, 1.0f);}
+}
+
+void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *HitResult.GetActor()->GetName());
+	Grabpoint = HitResult.ImpactPoint;
+	isGrappling = true;
+	MovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
+}
+
+void UGrapplingHookComponent::HandleMiss(FVector IntersectionPoint)
+{
+	UE_LOG(LogTemp, Warning, TEXT("No Hit"));
+	CableComponent->EndLocation = (IntersectionPoint - GetOwner()->GetActorLocation());
+	isGrappling = false;
+	UKismetSystemLibrary::Delay(GetWorld(), 0.2f, FLatentActionInfo());
+}
+
