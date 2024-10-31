@@ -46,7 +46,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
 	UDoubleJumpComponent* DoubleJumpComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Upgrades", meta = (AllowPrivate))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrades", meta = (AllowPrivate))
 	UGrapplingHookComponent* GrapplingHookComponent;
 
 
