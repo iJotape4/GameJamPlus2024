@@ -33,10 +33,10 @@ void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
 	if(!isGrappling)
 		return;
 
-	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(GetOwner()->GetTransform(), Grabpoint);
+	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(Character->GetTransform(), Grabpoint);
 	FVector ForceToApply;
-	ForceToApply =  UKismetMathLibrary::GetDirectionUnitVector(GetOwner()->GetActorLocation(), Grabpoint) + GetOwner()->GetActorRightVector()*0.7f;
-	UKismetMathLibrary::Vector_Normalize ( ForceToApply, 1.0f);
+	ForceToApply =  UKismetMathLibrary::GetDirectionUnitVector(Character->GetActorLocation(), Grabpoint) + (Character->GetActorRightVector() * 0.7f);
+	UKismetMathLibrary::Vector_Normalize ( ForceToApply, 0.0001f);
 	ForceToApply *= 250000.0f;
 	MovementComponent->AddForce(ForceToApply);
 }
