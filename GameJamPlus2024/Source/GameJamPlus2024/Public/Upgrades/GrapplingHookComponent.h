@@ -63,6 +63,7 @@ private:
 
 	UFUNCTION()
 	bool CalculateLinePlaneIntersection(const FVector& WorldLocation, const FVector& WorldDirection, FVector& IntersectionPoint) const;
+	void GetPointBetween2PointsByDistance(const FVector& IntersectionPoint, FVector StartPoint, FVector& Endpoint, float& Distance);
 
 	UFUNCTION()
 	void PerformLineTrace(const FVector& IntersectionPoint, FHitResult& OutHit);

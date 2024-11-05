@@ -101,6 +101,13 @@ bool UGrapplingHookComponent::CalculateLinePlaneIntersection(const FVector& Worl
 	return UKismetMathLibrary::LinePlaneIntersection_OriginNormal(Start, End, PlaneOrigin, PlaneNormal, T, IntersectionPoint);
 }
 
+void UGrapplingHookComponent::GetPointBetween2PointsByDistance(const FVector& IntersectionPoint, FVector StartPoint, FVector& Endpoint, float& Distance)
+{
+	FVector DirectionVector = StartPoint - IntersectionPoint;
+	DirectionVector.Normalize();
+	Endpoint = StartPoint - (DirectionVector*Distance);
+}
+
 void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint, FHitResult& OutHit)
 {
 	FCollisionQueryParams CollisionParams;
@@ -108,9 +115,7 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 	FVector StartPoint = Character->GetActorLocation();
 	FVector Endpoint;
 	
-	FVector DirectionVector = StartPoint - IntersectionPoint;
-	DirectionVector.Normalize();
-	Endpoint = StartPoint - (DirectionVector*GrapplingHookDistance);
+	GetPointBetween2PointsByDistance(IntersectionPoint, StartPoint, Endpoint, GrapplingHookDistance);
 	
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, StartPoint, Endpoint, ECC_Visibility, CollisionParams);
 
@@ -124,7 +129,7 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 		HandleMiss(Endpoint);
 	}
 	//Draw debug line for visualization
-	DrawDebugLine(GetWorld(), Character->GetActorLocation(), Endpoint, FColor::Red, false, 4.0f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), Character->GetActorLocation(), Endpoint, FColor::Red, false, 4.0f, 0, 1.0f);
 }
 
 void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
