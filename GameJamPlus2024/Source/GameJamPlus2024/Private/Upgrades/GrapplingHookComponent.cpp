@@ -105,8 +105,14 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 {
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
-
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Character->GetActorLocation(), IntersectionPoint, ECC_Visibility, CollisionParams);
+	FVector StartPoint = Character->GetActorLocation();
+	FVector Endpoint;
+	
+	FVector DirectionVector = StartPoint - IntersectionPoint;
+	DirectionVector.Normalize();
+	Endpoint = StartPoint - (DirectionVector*GrapplingHookDistance);
+	
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, StartPoint, Endpoint, ECC_Visibility, CollisionParams);
 
 	SetCableComponentVisibility(true);
 	if (bHit)
@@ -115,10 +121,10 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 	}
 	else
 	{
-		HandleMiss(IntersectionPoint);
+		HandleMiss(Endpoint);
 	}
 	//Draw debug line for visualization
-	//DrawDebugLine(GetWorld(), Character->GetActorLocation(), IntersectionPoint, FColor::Red, false, 4.0f, 0, 1.0f);}
+	DrawDebugLine(GetWorld(), Character->GetActorLocation(), Endpoint, FColor::Red, false, 4.0f, 0, 1.0f);
 }
 
 void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
@@ -129,10 +135,10 @@ void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
 	MovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
 }
 
-void UGrapplingHookComponent::HandleMiss(FVector IntersectionPoint)
+void UGrapplingHookComponent::HandleMiss(FVector EndPoint)
 {
 	UE_LOG(LogTemp, Warning, TEXT("No Hit"));
-	CableComponent->EndLocation = (IntersectionPoint - GetOwner()->GetActorLocation());
+	CableComponent->EndLocation = (EndPoint - GetOwner()->GetActorLocation());
 	isGrappling = false;
 	UKismetSystemLibrary::Delay(GetWorld(), 0.2f, FLatentActionInfo());
 }

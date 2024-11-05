@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grappling Hook", meta = (AllowPrivateAccess = "true"))
 	FVector Grabpoint;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category= "Grappling Hook", meta = (AllowPrivateAccess = "true"))
+	float GrapplingHookDistance = 500.0f;
+
 	void HookLineTrace(FHitResult& OutHit);
 	virtual void BeginPlay() override;
 
@@ -68,5 +71,5 @@ private:
 	void HandleHit(const FHitResult& HitResult);
 
 	UFUNCTION()
-	void HandleMiss(FVector IntersectionPoint);
+	void HandleMiss(FVector EndPoint);
 };
