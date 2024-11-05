@@ -29,7 +29,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Curve", meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* CableCurve;
 
-	FVector InitialLocation;
+	FVector InitialLocation =FVector::ZeroVector;;
 	FVector TargetLocation;
 
 	UFUNCTION()

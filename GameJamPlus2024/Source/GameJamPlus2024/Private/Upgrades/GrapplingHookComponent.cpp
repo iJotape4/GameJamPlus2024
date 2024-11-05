@@ -31,7 +31,7 @@ void UGrapplingHookComponent::RetractHook(const FInputActionValue& Value)
 
 void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
 {
-	if(!isGrappling)
+	if(!isGrappling || CableTimeline->IsPlaying())
 		return;
 
 	CableComponent->EndLocation = UKismetMathLibrary::InverseTransformLocation(Character->GetTransform(), Grabpoint);
@@ -81,14 +81,23 @@ bool UGrapplingHookComponent::InitializeComponents()
 
 void UGrapplingHookComponent::UpdateCableLocation(float Value)
 {
+	if(isGrappling)
+	{
+		TargetLocation = UKismetMathLibrary::InverseTransformLocation(Character->GetTransform(), Grabpoint);
+	}
 	FVector NewLocation = FMath::Lerp(InitialLocation, TargetLocation, Value);
 	CableComponent->EndLocation = NewLocation;
+	SetCableComponentVisibility(true);
 	//UE_LOG(LogTemp, Warning, TEXT("New Location: %s"), *NewLocation.ToString());
 }
 
 void UGrapplingHookComponent::OnTimelineFinished()
 {
-    if (!isGrappling)
+	if(isGrappling)
+	{
+		CableTimeline->Stop();
+	}
+    else
     {
         CableTimeline->Reverse();
         FLatentActionInfo LatentInfo;
@@ -157,7 +166,6 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 	
 	const bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, StartPoint, Endpoint, ECC_Visibility, CollisionParams);
 
-	SetCableComponentVisibility(true);
 	if (bHit)
 	{
 		HandleHit(OutHit);
@@ -166,6 +174,11 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 	{
 		HandleMiss(Endpoint);
 	}
+
+	if (CableTimeline)
+	{
+		CableTimeline->PlayFromStart();
+	}
 	//Draw debug line for visualization
 	//DrawDebugLine(GetWorld(), Character->GetActorLocation(), Endpoint, FColor::Red, false, 4.0f, 0, 1.0f);
 }
@@ -173,22 +186,14 @@ void UGrapplingHookComponent::PerformLineTrace(const FVector& IntersectionPoint,
 void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *HitResult.GetActor()->GetName());
-	Grabpoint = HitResult.ImpactPoint;
 	isGrappling = true;
+	Grabpoint = HitResult.ImpactPoint;
 	MovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
 }
 
 void UGrapplingHookComponent::HandleMiss(FVector EndPoint)
 {
-	UE_LOG(LogTemp, Warning, TEXT("No Hit"));
-	InitialLocation = FVector::ZeroVector;
 	TargetLocation = EndPoint - GetOwner()->GetActorLocation();
-	UE_LOG(LogTemp, Warning, TEXT("Target Location: %s"), *TargetLocation.ToString());
 	isGrappling = false;
-
-	if (CableTimeline)
-	{
-		CableTimeline->PlayFromStart();
-	}
 }
 
