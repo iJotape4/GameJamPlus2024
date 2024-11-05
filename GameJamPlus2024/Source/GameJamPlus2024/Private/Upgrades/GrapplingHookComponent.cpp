@@ -11,6 +11,7 @@
 #include "Kismet/KismetSystemLibrary.h"  // Optional for advanced tracing
 #include "Kismet/KismetMathLibrary.h"
 #include "CableComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -44,11 +45,27 @@ void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
 void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 {
 	CableComponent->SetVisibility(bVisible);
+	if(!bVisible && CableTimeline)
+	{
+		CableTimeline->Stop();
+	}
 }
 
 void UGrapplingHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CableCurve)
+	{
+		FOnTimelineFloat TimelineProgress;
+		TimelineProgress.BindUFunction(this, FName("UpdateCableLocation"));
+		CableTimeline = NewObject<UTimelineComponent>(this, FName("CableTimeline"));
+		CableTimeline->AddInterpFloat(CableCurve, TimelineProgress);
+		FOnTimelineEvent TimelineFinished;
+		TimelineFinished.BindUFunction(this, FName("OnTimelineFinished"));
+		CableTimeline->SetTimelineFinishedFunc(TimelineFinished);
+		CableTimeline->RegisterComponent();
+	}
 }
 
 bool UGrapplingHookComponent::InitializeComponents()
@@ -60,6 +77,27 @@ bool UGrapplingHookComponent::InitializeComponents()
 	CableComponent = GetOwner()->FindComponentByClass<UCableComponent>();
 	
 	return Camera && Character && PlayerController && MovementComponent  &&  CableComponent;
+}
+
+void UGrapplingHookComponent::UpdateCableLocation(float Value)
+{
+	FVector NewLocation = FMath::Lerp(InitialLocation, TargetLocation, Value);
+	CableComponent->EndLocation = NewLocation;
+	//UE_LOG(LogTemp, Warning, TEXT("New Location: %s"), *NewLocation.ToString());
+}
+
+void UGrapplingHookComponent::OnTimelineFinished()
+{
+    if (!isGrappling)
+    {
+        CableTimeline->Reverse();
+        FLatentActionInfo LatentInfo;
+        LatentInfo.CallbackTarget = this;
+        LatentInfo.ExecutionFunction = FName("SetCableComponentVisibility", false);
+        LatentInfo.Linkage = 0;
+        LatentInfo.UUID = __LINE__;
+        UKismetSystemLibrary::Delay(GetWorld(), 0.3f, LatentInfo);
+    }
 }
 
 void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)
@@ -143,8 +181,14 @@ void UGrapplingHookComponent::HandleHit(const FHitResult& HitResult)
 void UGrapplingHookComponent::HandleMiss(FVector EndPoint)
 {
 	UE_LOG(LogTemp, Warning, TEXT("No Hit"));
-	CableComponent->EndLocation = (EndPoint - GetOwner()->GetActorLocation());
+	InitialLocation = FVector::ZeroVector;
+	TargetLocation = EndPoint - GetOwner()->GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("Target Location: %s"), *TargetLocation.ToString());
 	isGrappling = false;
-	UKismetSystemLibrary::Delay(GetWorld(), 0.2f, FLatentActionInfo());
+
+	if (CableTimeline)
+	{
+		CableTimeline->PlayFromStart();
+	}
 }
 

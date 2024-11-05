@@ -4,6 +4,7 @@
 #include "CharacterUpgrade.h"
 #include "CableComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/TimelineComponent.h"
 #include "GrapplingHookComponent.generated.h"
 
 class UCameraComponent;
@@ -21,7 +22,22 @@ private:
 	APaperCharacterBase* Character;
 	APlayerController* PlayerController;
 	UCharacterMovementComponent* MovementComponent;
-	
+private:
+	UPROPERTY()
+	UTimelineComponent* CableTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Curve", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* CableCurve;
+
+	FVector InitialLocation;
+	FVector TargetLocation;
+
+	UFUNCTION()
+	void UpdateCableLocation(float Value);
+
+	UFUNCTION()	
+	void OnTimelineFinished();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grappling Hook", meta = (AllowPrivateAccess = "true"))
 	UCableComponent* CableComponent; 
