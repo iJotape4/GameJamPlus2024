@@ -45,10 +45,6 @@ void UGrapplingHookComponent::HookGrappling(const FInputActionValue& Value)
 void UGrapplingHookComponent::SetCableComponentVisibility(bool bVisible)
 {
 	CableComponent->SetVisibility(bVisible);
-	if(!bVisible && CableTimeline)
-	{
-		CableTimeline->Stop();
-	}
 }
 
 void UGrapplingHookComponent::BeginPlay()
@@ -102,11 +98,20 @@ void UGrapplingHookComponent::OnTimelineFinished()
         CableTimeline->Reverse();
         FLatentActionInfo LatentInfo;
         LatentInfo.CallbackTarget = this;
-        LatentInfo.ExecutionFunction = FName("SetCableComponentVisibility", false);
+        LatentInfo.ExecutionFunction = FName("OnReverseCableAfterFailFinished");
         LatentInfo.Linkage = 0;
         LatentInfo.UUID = __LINE__;
         UKismetSystemLibrary::Delay(GetWorld(), 0.3f, LatentInfo);
     }
+}
+
+void UGrapplingHookComponent::OnReverseCableAfterFailFinished()
+{
+	if(!isGrappling)
+		SetCableComponentVisibility(false);
+	
+	if(CableTimeline)
+		CableTimeline->Stop();
 }
 
 void UGrapplingHookComponent::HookLineTrace(FHitResult& OutHit)

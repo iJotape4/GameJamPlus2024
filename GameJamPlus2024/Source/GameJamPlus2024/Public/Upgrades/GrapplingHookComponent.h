@@ -38,6 +38,9 @@ private:
 	UFUNCTION()	
 	void OnTimelineFinished();
 
+	UFUNCTION()
+	void OnReverseCableAfterFailFinished();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grappling Hook", meta = (AllowPrivateAccess = "true"))
 	UCableComponent* CableComponent; 
